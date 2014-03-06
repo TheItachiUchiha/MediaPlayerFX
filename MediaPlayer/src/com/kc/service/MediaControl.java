@@ -46,6 +46,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.media.MediaView;
@@ -65,8 +66,14 @@ public class MediaControl extends HBox {
     private Slider timeSlider;
     private Label playTime;
     private Slider volumeSlider;
-    private Stage stage;
-    private Scene scene;
+    Stage stage;
+    Scene scene;
+	
+    public MediaControl()
+    {
+    	stage = new Stage();
+    }
+    
 
     public MediaControl(final MediaPlayer mp, MediaView mediaView) {
         this.mp = mp;
@@ -84,6 +91,13 @@ public class MediaControl extends HBox {
 
         final Button playButton = new Button(">");
         final Button playListButton = new Button("+");
+        
+        VBox box = new VBox();
+        box.getChildren().add(MediaController.listBox);
+    	scene = new Scene(box);
+    	stage.setScene(scene);
+    	stage.setHeight(365);
+    	stage.setWidth(335);
 
         playButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
@@ -114,12 +128,12 @@ public class MediaControl extends HBox {
 			public void handle(ActionEvent arg0) {
 				try
 				{
-					stage = new Stage();
-					scene = new Scene(MediaController.listBox);
-					stage.setScene(scene);
-					stage.setHeight(365);
-					stage.setWidth(335);
-					stage.show();
+					Platform.runLater(new Runnable() {
+						public void run() {
+							
+							stage.show();
+						}
+					});
 				}
 				catch (Exception e) {
 					e.printStackTrace();
