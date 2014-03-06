@@ -37,20 +37,22 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.media.MediaView;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import com.kc.controller.MediaController;
 
 public class MediaControl extends HBox {
 
@@ -63,6 +65,8 @@ public class MediaControl extends HBox {
     private Slider timeSlider;
     private Label playTime;
     private Slider volumeSlider;
+    private Stage stage;
+    private Scene scene;
 
     public MediaControl(final MediaPlayer mp, MediaView mediaView) {
         this.mp = mp;
@@ -79,6 +83,7 @@ public class MediaControl extends HBox {
         setPadding(new Insets(5, 10, 5, 10));
 
         final Button playButton = new Button(">");
+        final Button playListButton = new Button("+");
 
         playButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
@@ -103,6 +108,25 @@ public class MediaControl extends HBox {
                 }
             }
         });
+        playListButton.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent arg0) {
+				try
+				{
+					stage = new Stage();
+					scene = new Scene(MediaController.listBox);
+					stage.setScene(scene);
+					stage.setHeight(365);
+					stage.setWidth(335);
+					stage.show();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
         mp.currentTimeProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable ov) {
                 updateValues();
@@ -149,6 +173,11 @@ public class MediaControl extends HBox {
         // Add spacer
         Label spacer = new Label("   ");
         getChildren().add(spacer);
+        
+        getChildren().add(playListButton);
+        
+        Label spacer2 = new Label("   ");
+        getChildren().add(spacer2);
 
         // Add Time label
         Label timeLabel = new Label("Time: ");
@@ -195,6 +224,7 @@ public class MediaControl extends HBox {
 
         //setBottom(mediaBar);
     }
+    
 
     protected void updateValues() {
         if (playTime != null && timeSlider != null && volumeSlider != null) {
@@ -256,4 +286,5 @@ public class MediaControl extends HBox {
             }
         }
     }
+
 }
