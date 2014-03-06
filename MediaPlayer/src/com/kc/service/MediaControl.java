@@ -71,7 +71,7 @@ public class MediaControl extends HBox {
 	
     public MediaControl()
     {
-    	stage = new Stage();
+    	
     }
     
 
@@ -92,6 +92,7 @@ public class MediaControl extends HBox {
         final Button playButton = new Button(">");
         final Button playListButton = new Button("+");
         
+        stage = new Stage();
         VBox box = new VBox();
         box.getChildren().add(MediaController.listBox);
     	scene = new Scene(box);
