@@ -9,12 +9,15 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
@@ -26,6 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import com.kc.service.MediaControl;
@@ -34,7 +38,7 @@ public class MediaController extends Application implements Initializable{
     
     private MediaPlayer mp;
     private MediaView mediaView;
-    private Stage primaryStage;
+    public static Stage primaryStage;
     private Scene scene;
     public static VBox listBox;
     public static ListView<String> playList;
@@ -46,7 +50,6 @@ public class MediaController extends Application implements Initializable{
     
     @Override
 	public void initialize(URL paramURL, ResourceBundle paramResourceBundle) {
-    	
     	
 		
 	}
@@ -73,6 +76,7 @@ public class MediaController extends Application implements Initializable{
 	        listBox.getChildren().addAll(add,playList);
 	        this.primaryStage.show();
 	        playVideo(MEDIA_URL);
+	        
     	}
     	catch (Exception e) {
 			e.printStackTrace();
@@ -228,6 +232,21 @@ public class MediaController extends Application implements Initializable{
     	catch (Exception e) {
 			e.printStackTrace();
 		}
+    }
+    public void openFile()
+    {
+    	FileChooser fileChooser = new FileChooser();
+        File tempFile = fileChooser.showOpenDialog(primaryStage);
+        if(tempFile!=null){
+        	tempList.add(tempFile.getAbsolutePath());
+        	mp.stop();
+			playList.setItems(tempList);
+			playVideo("file:/"+(tempFile.getAbsolutePath()).replace("\\", "/").replace(" ", "%20"));    
+        }
+    }
+    public void exitPlayer()
+    {
+    	this.primaryStage.close();
     }
     public static void main(String[] args) {
         launch(args);
