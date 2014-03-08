@@ -3,54 +3,60 @@ package com.kc.controller;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import com.kc.service.MediaControl;
+import com.kc.service.MediaControlHide;
 
 public class MediaController extends Application implements Initializable {
 
-	private MediaPlayer mp;
+	private MediaPlayer mediaPlayer;
 	private MediaView mediaView;
 	public static Stage primaryStage;
-	private Scene scene;
-	public static VBox listBox;
-	public static ListView<String> playList;
-	public static Button add;
+	private static Scene scene;
 
-	private static final String MEDIA_URL = "file:/F:/newmoon.mp4";
+	// private static final String MEDIA_URL = "file:/F:/newmoon.mp4";
 	private ObservableList<String> tempList = FXCollections
 			.observableArrayList();
 	public static BorderPane root;
 	public static VBox box = new VBox();
 	public MenuBar menuBar;
+	private static MediaControl mediaControl;
+	private static Stage mediaControlStage;
+	private static StackPane stackPane;
+	private Executor executor;
 
 	@Override
 	public void initialize(URL paramURL, ResourceBundle paramResourceBundle) {
@@ -61,57 +67,39 @@ public class MediaController extends Application implements Initializable {
 	public void start(final Stage primaryStage) throws Exception {
 
 		try {
-			this.primaryStage = primaryStage;
+			MediaController.primaryStage = primaryStage;
 			primaryStage.setTitle("Media Player");
 			FXMLLoader loader = new FXMLLoader(
 					MediaController.class
 							.getResource("/com/kc/view/mediaControl.fxml"));
 			root = (BorderPane) loader.load();
 			menuBar = (MenuBar) root.getTop();
+			// creating Space for media
 			HBox rectangle = new HBox();
 			rectangle.setPrefSize(500, 300);
 			root.setCenter(rectangle);
-			Scene scene = new Scene(root);
-			this.scene = scene;
-			this.primaryStage.setScene(this.scene);
 
-			listBox = new VBox(5);
-			playList = new ListView<String>();
-			add = new Button("Add");
-			listBox.getChildren().addAll(add, playList);
-			this.primaryStage.show();
-			playVideo(MEDIA_URL);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void playVideo(String MEDIA_URL) {
-		try {
-			Media media = new Media(MEDIA_URL);
-			// create media player
-			mp = new MediaPlayer(media);
-			mediaView = new MediaView(mp);
-
-			mp.setAutoPlay(true);
-			mp.play();
-			mediaView.setPreserveRatio(false);
-			mediaView.autosize();
-			final MediaControl mediaControl = new MediaControl(mp, mediaView);
-			root.setCenter(mediaView);
+			// Controls at Bottom
+			mediaControl = new MediaControl(
+					(MediaController) loader.getController());
 			root.setBottom(mediaControl);
 
-			mediaView.setFitHeight(scene.getHeight() - 25 - 40);
-			mediaView.setFitWidth(scene.getWidth());
+			final Scene scene = new Scene(root);
+			MediaController.scene = scene;
+			MediaController.scene.getStylesheets().add(MediaController.class.getResource("/com/kc/style/MediaPlayer.css").toExternalForm());
+			MediaController.primaryStage.setScene(MediaController.scene);
+			MediaController.primaryStage.show();
+			
+			executor = Executors.newCachedThreadPool();
+			
 			scene.widthProperty().addListener(new ChangeListener<Number>() {
 
 				@Override
 				public void changed(
 						ObservableValue<? extends Number> observable,
 						Number oldValue, Number newValue) {
-					mediaView.setFitWidth(newValue.doubleValue());
+					if(null!=mediaView)
+						mediaView.setFitWidth(newValue.doubleValue());
 				}
 			});
 
@@ -122,10 +110,13 @@ public class MediaController extends Application implements Initializable {
 						ObservableValue<? extends Number> observable,
 						Number oldValue, Number newValue) {
 					// Subtracting height of MediaControl & Menu on top
-					if (!primaryStage.isFullScreen())
-						mediaView.setFitHeight(newValue.doubleValue() - 25 - 40);
-					else
-						mediaView.setFitHeight(newValue.doubleValue());
+					if(null!=mediaView)
+					{
+						if (!primaryStage.isFullScreen())
+								mediaView.setFitHeight(newValue.doubleValue() - 25 - 40);
+						else
+								mediaView.setFitHeight(newValue.doubleValue());
+					}
 				}
 			});
 
@@ -139,10 +130,21 @@ public class MediaController extends Application implements Initializable {
 								if (mouseEvent.getClickCount() == 2) {
 									if (primaryStage.isFullScreen()) {
 										root.setTop(menuBar);
+										root.setBottom(mediaControl);
+										stackPane.getChildren().clear();
+										scene.setRoot(root);
 										primaryStage.setFullScreen(false);
+										//mediaControlStage = new Stage();
 									} else {
 										root.setTop(new VBox());
+										root.setBottom(new HBox());
+										stackPane = new StackPane();
+										stackPane.getChildren().addAll(root, mediaControl);
+										scene.setRoot(stackPane);
 										primaryStage.setFullScreen(true);
+										StackPane.setMargin(mediaControl, new Insets(scene.getHeight()- 35, 0, 10, 0));
+										MediaControlHide command = new MediaControlHide(primaryStage, mediaControl);
+										executor.execute(command);
 									}
 								}
 							}
@@ -172,8 +174,9 @@ public class MediaController extends Application implements Initializable {
 							tempList.add(file.getAbsolutePath());
 							filePath = file.getAbsolutePath();
 						}
-						mp.stop();
-						playList.setItems(tempList);
+						if(null!=mediaPlayer)
+							mediaPlayer.stop();
+						mediaControl.resetPlayList(tempList);
 						playVideo("file:/"
 								+ (filePath).replace("\\", "/").replace(" ",
 										"%20"));
@@ -182,55 +185,61 @@ public class MediaController extends Application implements Initializable {
 
 				}
 			});
-
-			playList.getSelectionModel().selectedItemProperty()
-					.addListener(new ChangeListener<String>() {
-
+			
+			scene.addEventFilter(MouseEvent.ANY,
+					new EventHandler<MouseEvent>() {
 						@Override
-						public void changed(
-								ObservableValue<? extends String> observable,
-								String oldValue, String newValue) {
-
-							mp.stop();
-							playVideo("file:/"
-									+ (newValue).replace("\\", "/").replace(
-											" ", "%20"));
-
+						public void handle(MouseEvent arg0) {
+							if(primaryStage.isFullScreen())
+							{
+								mediaControl.setOpacity(1.0);
+							}
 						}
-					});
-			playList.setOnDragOver(new EventHandler<DragEvent>() {
-				@Override
-				public void handle(DragEvent event) {
-					Dragboard db = event.getDragboard();
-					if (db.hasFiles()) {
-						event.acceptTransferModes(TransferMode.COPY);
-					} else {
-						event.consume();
-					}
-				}
 			});
-			playList.setOnDragDropped(new EventHandler<DragEvent>() {
+			
+			
+			scene.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			        @Override
+			        public void handle(KeyEvent t) {
+			          if(t.getCode()==KeyCode.ESCAPE)
+			          {
+			        	  if (((HBox)root.getBottom()).getChildren().size()==0) {
+								root.setTop(menuBar);
+								root.setBottom(mediaControl);
+								stackPane.getChildren().clear();
+								scene.setRoot(root);
+								primaryStage.setFullScreen(false);
+								mediaView.setFitHeight(scene.getHeight() - 25 - 40);
+							}
+			          }
+			        }
+			    });
 
-				@Override
-				public void handle(DragEvent event) {
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-					Dragboard db = event.getDragboard();
-					if (db.hasFiles()) {
-						String filePath = null;
-						for (File file : db.getFiles()) {
-							tempList.add(file.getAbsolutePath());
-							filePath = file.getAbsolutePath();
-						}
-						mp.stop();
-						playList.setItems(tempList);
-						playVideo("file:/"
-								+ (filePath).replace("\\", "/").replace(" ",
-										"%20"));
-						System.out.println(filePath);
-					}
+	}
 
-				}
-			});
+	public void playVideo(String MEDIA_URL) {
+		try {
+			Media media = new Media(MEDIA_URL);
+			// create media player
+			mediaPlayer = new MediaPlayer(media);
+			mediaControl.setMediaPlayer(mediaPlayer);
+			mediaView = new MediaView(mediaPlayer);
+			mediaControl.setMediaView(mediaView);
+
+			mediaPlayer.setAutoPlay(true);
+			mediaPlayer.play();
+			mediaView.setPreserveRatio(false);
+			mediaView.autosize();
+
+			root.setCenter(mediaView);
+
+			mediaView.setFitHeight(scene.getHeight() - 25 - 40);
+			mediaView.setFitWidth(scene.getWidth());
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -242,8 +251,10 @@ public class MediaController extends Application implements Initializable {
 		File tempFile = fileChooser.showOpenDialog(primaryStage);
 		if (tempFile != null) {
 			tempList.add(tempFile.getAbsolutePath());
-			mp.stop();
-			playList.setItems(tempList);
+			if (null != mediaPlayer){
+				mediaPlayer.stop();
+			}
+			mediaControl.resetPlayList(tempList);
 			playVideo("file:/"
 					+ (tempFile.getAbsolutePath()).replace("\\", "/").replace(
 							" ", "%20"));
