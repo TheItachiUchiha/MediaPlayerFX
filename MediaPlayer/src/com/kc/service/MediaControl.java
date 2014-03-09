@@ -18,6 +18,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -45,11 +50,15 @@ public class MediaControl extends HBox {
     private Label playTime;
     private Slider volumeSlider;
     private Button playButton;
+    private Button stopButton;
     private Button playListButton;
+    private ToggleButton volButton;
+    private ToggleGroup group;
     private VBox listBox;
     private ListView<String> playList;
     private Button add;
     private MediaController mediaController;
+    double prevVolStatus=1;
     private ObservableList<String> tempList = FXCollections
 			.observableArrayList();
 
@@ -58,16 +67,18 @@ public class MediaControl extends HBox {
     public MediaControl(final MediaController mediaController) {
     	
     	this.mediaController = mediaController;
-        /*setStyle("-fx-background-color: #bfc2c7;");
-        setStyle("-fx-background-color: white;");*/
+        setStyle("-fx-background-color: #3E3E3E;");
         setId("control-bar");
-        setPrefHeight(40);
+        setPrefHeight(50);
         setAlignment(Pos.CENTER);
         setPadding(new Insets(5, 10, 5, 10));
        
-        playButton = new Button(">");
-        playListButton = new Button("+");
-        
+        playButton = new Button();
+        playButton.setId("play");
+        stopButton = new Button();
+        stopButton.setId("stop");
+        playListButton = new Button();
+        playListButton.setId("playlist");
         listBox = new VBox(5);
 		playList = new ListView<String>();
 		add = new Button("Add");
@@ -99,14 +110,15 @@ public class MediaControl extends HBox {
         
 
         getChildren().add(playButton);
+        getChildren().add(stopButton);
         // Add spacer
-        Label spacer = new Label("   ");
-        getChildren().add(spacer);
+        /*Label spacer = new Label("   ");
+        getChildren().add(spacer);*/
         
-        getChildren().add(playListButton);
         
-        Label spacer2 = new Label("   ");
-        getChildren().add(spacer2);
+        
+        /*Label spacer2 = new Label("   ");
+        getChildren().add(spacer2);*/
 
         // Add Time label
         Label timeLabel = new Label("Time: ");
@@ -136,9 +148,32 @@ public class MediaControl extends HBox {
         playTime.setMinWidth(50);
         getChildren().add(playTime);
 
+        //Add the Playlist
+        getChildren().add(playListButton);
+        
         // Add the volume label
-        Label volumeLabel = new Label("Vol: ");
-        getChildren().add(volumeLabel);
+        group = new ToggleGroup();
+        volButton = new ToggleButton();
+        volButton.setToggleGroup(group);
+        volButton.setId("volume");
+        getChildren().add(volButton);
+        group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable,
+					Toggle oldValue, Toggle newValue) {
+				
+				if (oldValue !=null)
+		        {
+					mediaPlayer.setVolume(prevVolStatus);
+		        }
+				else if (newValue !=null)
+				{
+					mediaPlayer.setVolume(0);
+				}
+				
+			}
+		});
 
         // Add Volume slider
         volumeSlider = new Slider();
@@ -149,8 +184,11 @@ public class MediaControl extends HBox {
             public void invalidated(Observable ov) {
                 if (volumeSlider.isValueChanging()) {
                 	if(null!=mediaPlayer)
+                	{
                 		// multiply duration by percentage calculated by slider position
                 		mediaPlayer.setVolume(volumeSlider.getValue() / 100.0);
+                		prevVolStatus=volumeSlider.getValue() / 100.0;
+                	}
                 	else
                 		volumeSlider.setValue(0);
                     
@@ -289,7 +327,9 @@ public class MediaControl extends HBox {
                     mediaPlayer.pause();
                     stopRequested = false;
                 } else {
-                    playButton.setText("||");
+                	Image imageOk = new Image(getClass().getResourceAsStream("/com/kc/style/pause-icon.png"));
+                    playButton.setGraphic(new ImageView(imageOk));
+                    //playButton.setText("||");
                 }
             }
         });
@@ -297,7 +337,9 @@ public class MediaControl extends HBox {
         mediaPlayer.setOnPaused(new Runnable() {
             public void run() {
                 System.out.println("onPaused");
-                playButton.setText(">");
+                Image imageOk = new Image(getClass().getResourceAsStream("/com/kc/style/play-icon.png"));
+                playButton.setGraphic(new ImageView(imageOk));
+                //playButton.setText(">");
             }
         });
 
@@ -312,7 +354,9 @@ public class MediaControl extends HBox {
         mediaPlayer.setOnEndOfMedia(new Runnable() {
             public void run() {
                 if (!repeat) {
-                    playButton.setText(">");
+                	Image imageOk = new Image(getClass().getResourceAsStream("/com/kc/style/play-icon.png"));
+                    playButton.setGraphic(new ImageView(imageOk));
+                    //playButton.setText(">");
                     stopRequested = true;
                     atEndOfMedia = true;
                 }
@@ -342,6 +386,18 @@ public class MediaControl extends HBox {
                 }
             }
         });
+        stopButton.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent arg0) {
+					
+				mediaPlayer.stop();
+				 Image imageOk = new Image(getClass().getResourceAsStream("/com/kc/style/play-icon.png"));
+	             playButton.setGraphic(new ImageView(imageOk));
+				
+			}
+		});
+       
     } 
     public void setMediaView(MediaView mediaView)
     {
