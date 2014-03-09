@@ -66,6 +66,13 @@
  	 -fx-background-position: center;
  	 -fx-padding: 3px;
 }
+#pause {
+	
+	-fx-graphic: url("pause-icon.png");
+	-fx-background-repeat: no-repeat;
+ 	 -fx-background-position: center;
+ 	 -fx-padding: 3px;
+}
 #play:hover {
 	
 	-fx-graphic: url("play-hover-icon.png");

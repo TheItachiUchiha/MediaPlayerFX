@@ -21,8 +21,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -140,6 +138,17 @@ public class MediaControl extends HBox {
                 }
             }
         });
+       
+        /*timeSlider.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent paramT) {
+				
+				mediaPlayer.seek(duration.multiply(timeSlider.getValue() / 100.0));
+				System.out.println("hello");
+				
+			}
+		});*/
         getChildren().add(timeSlider);
 
         // Add Play label
@@ -165,7 +174,7 @@ public class MediaControl extends HBox {
 				
 				if (oldValue !=null)
 		        {
-					mediaPlayer.setVolume(prevVolStatus);
+					mediaPlayer.setVolume(0.5);
 		        }
 				else if (newValue !=null)
 				{
@@ -195,7 +204,21 @@ public class MediaControl extends HBox {
                 }
             }
         });
+       
         getChildren().add(volumeSlider);
+       
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(
+					ObservableValue<? extends Number> paramObservableValue,
+					Number paramT1, Number paramT2) {
+				
+				mediaPlayer.setVolume(volumeSlider.getValue() / 100.0);
+        		prevVolStatus=volumeSlider.getValue() / 100.0;
+				
+			}
+		});
 
 		playList.getSelectionModel().selectedItemProperty()
 		.addListener(new ChangeListener<String>() {
@@ -327,8 +350,7 @@ public class MediaControl extends HBox {
                     mediaPlayer.pause();
                     stopRequested = false;
                 } else {
-                	Image imageOk = new Image(getClass().getResourceAsStream("/com/kc/style/pause-icon.png"));
-                    playButton.setGraphic(new ImageView(imageOk));
+                    playButton.setId("pause");
                     //playButton.setText("||");
                 }
             }
@@ -337,8 +359,7 @@ public class MediaControl extends HBox {
         mediaPlayer.setOnPaused(new Runnable() {
             public void run() {
                 System.out.println("onPaused");
-                Image imageOk = new Image(getClass().getResourceAsStream("/com/kc/style/play-icon.png"));
-                playButton.setGraphic(new ImageView(imageOk));
+                playButton.setId("play");
                 //playButton.setText(">");
             }
         });
@@ -354,8 +375,7 @@ public class MediaControl extends HBox {
         mediaPlayer.setOnEndOfMedia(new Runnable() {
             public void run() {
                 if (!repeat) {
-                	Image imageOk = new Image(getClass().getResourceAsStream("/com/kc/style/play-icon.png"));
-                    playButton.setGraphic(new ImageView(imageOk));
+                    playButton.setId("play");
                     //playButton.setText(">");
                     stopRequested = true;
                     atEndOfMedia = true;
@@ -392,8 +412,7 @@ public class MediaControl extends HBox {
 			public void handle(ActionEvent arg0) {
 					
 				mediaPlayer.stop();
-				 Image imageOk = new Image(getClass().getResourceAsStream("/com/kc/style/play-icon.png"));
-	             playButton.setGraphic(new ImageView(imageOk));
+	             playButton.setId("play");
 				
 			}
 		});
