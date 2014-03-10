@@ -6,9 +6,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import javafx.animation.FadeTransition;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -35,7 +33,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import com.kc.service.MediaControl;
 import com.kc.service.MediaControlHide;
@@ -48,7 +45,9 @@ public class MediaController extends Application implements Initializable {
 	private static Scene scene;
 
 	// private static final String MEDIA_URL = "file:/F:/newmoon.mp4";
-	private ObservableList<String> tempList = FXCollections
+	public static ObservableList<String> tempList = FXCollections
+			.observableArrayList();
+	private ObservableList<File> fileList = FXCollections
 			.observableArrayList();
 	public static BorderPane root;
 	public static VBox box = new VBox();
@@ -170,6 +169,7 @@ public class MediaController extends Application implements Initializable {
 					Dragboard db = event.getDragboard();
 					if (db.hasFiles()) {
 						String filePath = null;
+						tempList.clear();
 						for (File file : db.getFiles()) {
 							tempList.add(file.getAbsolutePath());
 							filePath = file.getAbsolutePath();
@@ -229,7 +229,6 @@ public class MediaController extends Application implements Initializable {
 			mediaControl.setMediaPlayer(mediaPlayer);
 			mediaView = new MediaView(mediaPlayer);
 			mediaControl.setMediaView(mediaView);
-
 			mediaPlayer.setAutoPlay(true);
 			mediaPlayer.play();
 			mediaView.setPreserveRatio(false);
@@ -247,18 +246,21 @@ public class MediaController extends Application implements Initializable {
 	}
 
 	public void openFile() {
-		FileChooser fileChooser = new FileChooser();
-		File tempFile = fileChooser.showOpenDialog(primaryStage);
-		if (tempFile != null) {
-			tempList.add(tempFile.getAbsolutePath());
-			if (null != mediaPlayer){
-				mediaPlayer.stop();
-			}
-			mediaControl.resetPlayList(tempList);
-			playVideo("file:/"
-					+ (tempFile.getAbsolutePath()).replace("\\", "/").replace(
-							" ", "%20"));
+		FileChooser chooser = new FileChooser();
+		chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("MP4 files", "*.mp4", "*.uvu", "*.m4v"));
+		
+		fileList.clear();
+		fileList.addAll(chooser.showOpenMultipleDialog(MediaController.primaryStage));
+		if(fileList!=null)
+		{
+			tempList.clear();
+            for (File file : fileList) {
+            	
+                tempList.add(file.getAbsolutePath());
+            }
 		}
+			mediaControl.resetPlayList(tempList);
 	}
 
 	public void exitPlayer() {

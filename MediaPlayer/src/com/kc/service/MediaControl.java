@@ -23,6 +23,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -31,6 +32,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.media.MediaView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -55,9 +57,11 @@ public class MediaControl extends HBox {
     private VBox listBox;
     private ListView<String> playList;
     private Button add;
+    private Button remove;
     private MediaController mediaController;
     double prevVolStatus=1;
-    private ObservableList<String> tempList = FXCollections
+    String currentVedio="";
+    private ObservableList<File> fileList = FXCollections
 			.observableArrayList();
 
     
@@ -80,7 +84,12 @@ public class MediaControl extends HBox {
         listBox = new VBox(5);
 		playList = new ListView<String>();
 		add = new Button("Add");
-		listBox.getChildren().addAll(add, playList);
+		remove = new Button("Remove");
+		HBox box = new HBox(5);
+		box.setPadding(new Insets(0, 5, 5, 5));
+		box.getChildren().addAll(add,remove);
+		box.setAlignment(Pos.CENTER);
+		listBox.getChildren().addAll(playList,box);
 		final Scene scene = new Scene(listBox);
         
         playListButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -106,6 +115,45 @@ public class MediaControl extends HBox {
 			}
 		});
         
+        add.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent paramT) {
+				
+				playButton.setDisable(false);
+				FileChooser chooser = new FileChooser();
+				chooser.getExtensionFilters().addAll(
+		                new FileChooser.ExtensionFilter("MP4 files", "*.mp4", "*.uvu", "*.m4v"));
+
+
+				fileList.addAll(chooser.showOpenMultipleDialog(MediaController.primaryStage));
+				if(fileList!=null)
+				{
+	                for (File file : fileList) {
+	                	
+	                    MediaController.tempList.add(file.getAbsolutePath());
+	                }
+	                playList.setItems( MediaController.tempList);
+				}
+			}
+		});
+        
+        remove.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent paramT) {
+				if(playList.getSelectionModel().getSelectedItem()!=null)
+				{
+					if(playList.getSelectionModel().getSelectedItem().equals(currentVedio))
+					{
+						mediaPlayer.stop();
+						playButton.setId("play");
+						playButton.setDisable(true);
+					}
+					 MediaController.tempList.remove(playList.getSelectionModel().getSelectedItem());
+				}
+			}
+		});
 
         getChildren().add(playButton);
         getChildren().add(stopButton);
@@ -219,22 +267,30 @@ public class MediaControl extends HBox {
 				
 			}
 		});
-
-		playList.getSelectionModel().selectedItemProperty()
-		.addListener(new ChangeListener<String>() {
+        
+        playList.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
 			@Override
-			public void changed(
-					ObservableValue<? extends String> observable,
-					String oldValue, String newValue) {
-
-				mediaPlayer.stop();
-				mediaController.playVideo("file:/"
-						+ (newValue).replace("\\", "/").replace(
-								" ", "%20"));
-
+			public void handle(MouseEvent click) {
+				
+				if(click.getClickCount()==2)
+				{
+					if(playList.getSelectionModel().getSelectedItem()!=null)
+					{
+						playButton.setDisable(false);
+						if(mediaPlayer!=null)
+						{
+							mediaPlayer.stop();
+						}
+						mediaController.playVideo("file:/"+ (playList.getSelectionModel().getSelectedItem())
+								.replace("\\", "/").replace(" ", "%20"));
+						currentVedio=playList.getSelectionModel().getSelectedItem();
+					}
+				}
+				
 			}
 		});
+        
 		playList.setOnDragOver(new EventHandler<DragEvent>() {
 			@Override
 			public void handle(DragEvent event) {
@@ -255,17 +311,19 @@ public class MediaControl extends HBox {
 				if (db.hasFiles()) {
 					String filePath = null;
 					for (File file : db.getFiles()) {
-						tempList.add(file.getAbsolutePath());
+						 MediaController.tempList.add(file.getAbsolutePath());
 						filePath = file.getAbsolutePath();
 					}
 					if(null!=mediaPlayer)
 					{
 						mediaPlayer.stop();
 					}
-					playList.setItems(tempList);
+					playList.setItems( MediaController.tempList);
 					mediaController.playVideo("file:/"
 							+ (filePath).replace("\\", "/").replace(" ",
 									"%20"));
+					playButton.setDisable(false);
+					currentVedio=filePath;
 					System.out.println(filePath);
 				}
 		
