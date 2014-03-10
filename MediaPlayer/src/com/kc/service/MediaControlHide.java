@@ -1,10 +1,6 @@
 package com.kc.service;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javafx.animation.FadeTransition;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -31,7 +27,7 @@ public class MediaControlHide implements Runnable {
 				if(mediaControl.getOpacity() == 1)
 				{
 					System.out.println("This is it");
-					Thread.currentThread().sleep(2000);
+					Thread.sleep(2000);
 					ft.setFromValue(1.0);
 					ft.setToValue(0.0);
 					ft.setCycleCount(1);

@@ -46,9 +46,9 @@ public class MediaControl extends HBox {
     private boolean stopRequested = false;
     private boolean atEndOfMedia = false;
     private Duration duration;
-    private Slider timeSlider;
+    private SlidoBar timeSlider;
     private Label playTime;
-    private Slider volumeSlider;
+    private SlidoBar volumeSlider;
     private Button playButton;
     private Button stopButton;
     private Button playListButton;
@@ -168,21 +168,22 @@ public class MediaControl extends HBox {
 
         // Add Time label
         Label timeLabel = new Label("Time: ");
+        timeLabel.setMinWidth(40);
         getChildren().add(timeLabel);
 
         // Add time slider
-        timeSlider = new Slider();
+        timeSlider = new SlidoBar();
         HBox.setHgrow(timeSlider, Priority.ALWAYS);
         timeSlider.setMinWidth(50);
         timeSlider.setMaxWidth(Double.MAX_VALUE);
-        timeSlider.valueProperty().addListener(new InvalidationListener() {
+        timeSlider.getSlider().valueProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable ov) {
-                if (timeSlider.isValueChanging()) {
+                if (timeSlider.getSlider().isValueChanging()) {
                 	if(null!=mediaPlayer)
                 		// multiply duration by percentage calculated by slider position
-                		mediaPlayer.seek(duration.multiply(timeSlider.getValue() / 100.0));
+                		mediaPlayer.seek(duration.multiply(timeSlider.getSlider().getValue() / 100.0));
                 	else
-                		timeSlider.setValue(0);
+                		timeSlider.getSlider().setValue(0);
                 }
             }
         });
@@ -200,9 +201,9 @@ public class MediaControl extends HBox {
         getChildren().add(timeSlider);
 
         // Add Play label
-        playTime = new Label("00:00:00/00:00:00");
+        playTime = new Label(" 00:00:00/00:00:00");
         playTime.setPrefWidth(130);
-        playTime.setMinWidth(50);
+        playTime.setMinWidth(100);
         getChildren().add(playTime);
 
         //Add the Playlist
@@ -233,21 +234,22 @@ public class MediaControl extends HBox {
 		});
 
         // Add Volume slider
-        volumeSlider = new Slider();
+        volumeSlider = new SlidoBar();
         volumeSlider.setPrefWidth(70);
         volumeSlider.setMaxWidth(Region.USE_PREF_SIZE);
-        volumeSlider.setMinWidth(30);
-        volumeSlider.valueProperty().addListener(new InvalidationListener() {
+        volumeSlider.setMinWidth(70);
+        HBox.setHgrow(volumeSlider, Priority.ALWAYS);
+        volumeSlider.getSlider().valueProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable ov) {
-                if (volumeSlider.isValueChanging()) {
+                if (volumeSlider.getSlider().isValueChanging()) {
                 	if(null!=mediaPlayer)
                 	{
                 		// multiply duration by percentage calculated by slider position
-                		mediaPlayer.setVolume(volumeSlider.getValue() / 100.0);
-                		prevVolStatus=volumeSlider.getValue() / 100.0;
+                		mediaPlayer.setVolume(volumeSlider.getSlider().getValue() / 100.0);
+                		prevVolStatus=volumeSlider.getSlider().getValue() / 100.0;
                 	}
                 	else
-                		volumeSlider.setValue(0);
+                		volumeSlider.getSlider().setValue(0);
                     
                 }
             }
@@ -255,18 +257,6 @@ public class MediaControl extends HBox {
        
         getChildren().add(volumeSlider);
        
-        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(
-					ObservableValue<? extends Number> paramObservableValue,
-					Number paramT1, Number paramT2) {
-				
-				mediaPlayer.setVolume(volumeSlider.getValue() / 100.0);
-        		prevVolStatus=volumeSlider.getValue() / 100.0;
-				
-			}
-		});
         
         playList.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -329,7 +319,8 @@ public class MediaControl extends HBox {
 		
 			}
 		});
-		    }
+		
+    }
     
 
     protected void updateValues() {
@@ -337,16 +328,16 @@ public class MediaControl extends HBox {
             Platform.runLater(new Runnable() {
                 public void run() {
                     Duration currentTime = mediaPlayer.getCurrentTime();
-                    playTime.setText(formatTime(currentTime, duration));
+                    playTime.setText(" " + formatTime(currentTime, duration));
                     timeSlider.setDisable(duration.isUnknown());
                     if (!timeSlider.isDisabled()
                             && duration.greaterThan(Duration.ZERO)
-                            && !timeSlider.isValueChanging()) {
-                        timeSlider.setValue(currentTime.divide(duration).toMillis()
+                            && !timeSlider.getSlider().isValueChanging()) {
+                        timeSlider.getSlider().setValue(currentTime.divide(duration).toMillis()
                                 * 100.0);
                     }
-                    if (!volumeSlider.isValueChanging()) {
-                        volumeSlider.setValue((int) Math.round(mediaPlayer.getVolume()
+                    if (!volumeSlider.getSlider().isValueChanging()) {
+                        volumeSlider.getSlider().setValue((int) Math.round(mediaPlayer.getVolume()
                                 * 100));
                     }
                 }
@@ -476,6 +467,8 @@ public class MediaControl extends HBox {
 		});
        
     } 
+    
+    
     public void setMediaView(MediaView mediaView)
     {
     	this.mediaView = mediaView;
@@ -484,6 +477,11 @@ public class MediaControl extends HBox {
     public void resetPlayList(ObservableList<String> list)
     {
     	playList.setItems(list);
+    }
+    
+    public SlidoBar getTimeSlider()
+    {
+    	return this.timeSlider;
     }
 
 }
