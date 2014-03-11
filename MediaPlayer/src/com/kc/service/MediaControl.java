@@ -1,6 +1,8 @@
 package com.kc.service;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -17,7 +19,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Slider;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -126,10 +127,11 @@ public class MediaControl extends HBox {
 		                new FileChooser.ExtensionFilter("MP4 files", "*.mp4", "*.uvu", "*.m4v"));
 
 
-				fileList.addAll(chooser.showOpenMultipleDialog(MediaController.primaryStage));
-				if(fileList!=null)
+				List<File> listOfFiles = new ArrayList<File>();
+				listOfFiles=chooser.showOpenMultipleDialog(MediaController.primaryStage);
+				if(listOfFiles!=null)
 				{
-	                for (File file : fileList) {
+	                for (File file : listOfFiles) {
 	                	
 	                    MediaController.tempList.add(file.getAbsolutePath());
 	                }

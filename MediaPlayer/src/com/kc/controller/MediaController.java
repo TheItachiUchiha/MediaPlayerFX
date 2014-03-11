@@ -2,6 +2,8 @@ package com.kc.controller;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -46,8 +48,6 @@ public class MediaController extends Application implements Initializable {
 
 	// private static final String MEDIA_URL = "file:/F:/newmoon.mp4";
 	public static ObservableList<String> tempList = FXCollections
-			.observableArrayList();
-	private ObservableList<File> fileList = FXCollections
 			.observableArrayList();
 	public static BorderPane root;
 	public static VBox box = new VBox();
@@ -252,17 +252,16 @@ public class MediaController extends Application implements Initializable {
 		chooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("MP4 files", "*.mp4", "*.uvu", "*.m4v"));
 		
-		fileList.clear();
-		fileList.addAll(chooser.showOpenMultipleDialog(MediaController.primaryStage));
-		if(fileList!=null)
+		List<File> listOfFiles = new ArrayList<File>();
+		listOfFiles=chooser.showOpenMultipleDialog(MediaController.primaryStage);
+		if(listOfFiles!=null)
 		{
 			tempList.clear();
-            for (File file : fileList) {
-            	
+            for (File file : listOfFiles) {
                 tempList.add(file.getAbsolutePath());
             }
+            mediaControl.resetPlayList(tempList);
 		}
-			mediaControl.resetPlayList(tempList);
 	}
 
 	public void exitPlayer() {
