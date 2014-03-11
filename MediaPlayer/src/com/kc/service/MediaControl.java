@@ -282,6 +282,7 @@ public class MediaControl extends HBox {
 						}
 						mediaController.playVideo("file:/"+ (playList.getSelectionModel().getSelectedItem())
 								.replace("\\", "/").replace(" ", "%20"));
+						volButton.setSelected(false);
 						currentVedio=playList.getSelectionModel().getSelectedItem();
 					}
 				}
