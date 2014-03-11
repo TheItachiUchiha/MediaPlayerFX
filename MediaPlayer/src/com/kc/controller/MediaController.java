@@ -13,11 +13,16 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -34,7 +39,9 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import com.kc.service.MediaControl;
 import com.kc.service.MediaControlHide;
@@ -267,9 +274,50 @@ public class MediaController extends Application implements Initializable {
 	public void exitPlayer() {
 		primaryStage.close();
 	}
+	
+	public void about()
+	{
+		final Stage stage = new Stage();
+		stage.initStyle(StageStyle.TRANSPARENT);
+		stage.initModality(Modality.WINDOW_MODAL);
+		stage.initOwner(this.primaryStage);
+		VBox stageBox = new VBox(10);
+		stageBox.setPadding(new Insets(0, 0, 0, 10));
+		HBox closeBox = new HBox();
+		Button closeButton = new Button("");
+		closeButton.setId("close");
+		closeBox.setAlignment(Pos.TOP_RIGHT);
+		closeBox.getChildren().add(closeButton);
+		Label label = new Label("Media player");
+		Hyperlink link = new Hyperlink("Google");
+		stageBox.getChildren().addAll(closeBox,label,link);
+		Scene scene = new Scene(stageBox,200,200);
+		scene.getStylesheets().add(MediaController.class.getResource("/com/kc/style/MediaPlayer.css").toExternalForm());
+		stage.setScene(scene);
+		stage.show();
+		
+		closeButton.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent event) {
+				
+				stage.close();
+				
+			}
+		});
+		link.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent event) {
+				
+				getHostServices().showDocument("https://www.google.co.in/");
+				
+			}
+		});
+	}
 
 	public static void main(String[] args) {
 		launch(args);
 	}
-
+	
 }

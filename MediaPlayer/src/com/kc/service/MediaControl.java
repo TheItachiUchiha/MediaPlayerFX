@@ -124,7 +124,7 @@ public class MediaControl extends HBox {
 				playButton.setDisable(false);
 				FileChooser chooser = new FileChooser();
 				chooser.getExtensionFilters().addAll(
-		                new FileChooser.ExtensionFilter("MP4 files", "*.mp4", "*.uvu", "*.m4v"));
+		                new FileChooser.ExtensionFilter("MP4 files", "*.mp4", "*.uvu", "*.m4v","*.mp3"));
 
 
 				List<File> listOfFiles = new ArrayList<File>();

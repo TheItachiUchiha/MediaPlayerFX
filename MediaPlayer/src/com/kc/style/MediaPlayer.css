@@ -89,3 +89,9 @@
  	 -fx-background-position: center;
  	 -fx-padding: 3px;
 }
+#close{
+	 -fx-background-color: transparent; 
+	 -fx-background-radius: 0,0,0;
+	 -fx-graphic: url("close.png");
+	 
+	 }
