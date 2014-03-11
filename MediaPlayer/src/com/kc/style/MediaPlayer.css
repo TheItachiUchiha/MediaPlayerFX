@@ -12,7 +12,11 @@
 	 -fx-background-radius: 0,0,0;
 	 
 	 }
-	 
+	
+#timeLabel{
+	-fx-text-fill : white;
+} 
+
 #play {
 	
 	-fx-graphic: url("play-icon.png");
@@ -92,7 +96,7 @@
 #close{
 	 -fx-background-color: transparent; 
 	 -fx-background-radius: 0,0,0;
-	 -fx-graphic: url("close-icon.png");
+	 -fx-graphic: url("close-icon.gif");
 	 
 	 }
 #add{
@@ -113,3 +117,25 @@
 	 -fx-graphic: url("delete-icon.png");
 	 
 	 }
+#about{
+	-fx-background-color: linear-gradient(#2A5058, #61a2b1);
+	-fx-border-color: black;
+	-fx-border-width: 1px;
+}
+#header1{
+	-fx-text-fill : rgb(0,0,0);
+	-fx-font-size: 18px;
+    
+}
+
+#version{
+	-fx-text-fill : rgb(0,0,0);
+	-fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+#link{
+	-fx-text-fill : rgb(0,0,160);
+	-fx-font-size: 16px;
+    
+}

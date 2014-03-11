@@ -1,7 +1,10 @@
 package com.kc.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -15,6 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -24,6 +28,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -45,16 +50,16 @@ import javafx.stage.StageStyle;
 
 import com.kc.service.MediaControl;
 import com.kc.service.MediaControlHide;
+import com.kc.service.WarningDialog;
+import com.kc.utils.PropertiesUtils;
 
 public class MediaController extends Application implements Initializable {
 
 	private MediaPlayer mediaPlayer;
-	private MediaView mediaView;
+	private static MediaView mediaView;
 	public static Stage primaryStage;
 	private static Scene scene;
-
-	// private static final String MEDIA_URL = "file:/F:/newmoon.mp4";
-	public static ObservableList<String> tempList = FXCollections
+	public static ObservableList<File> tempList = FXCollections
 			.observableArrayList();
 	public static BorderPane root;
 	public static VBox box = new VBox();
@@ -92,19 +97,21 @@ public class MediaController extends Application implements Initializable {
 
 			final Scene scene = new Scene(root);
 			MediaController.scene = scene;
-			MediaController.scene.getStylesheets().add(MediaController.class.getResource("/com/kc/style/MediaPlayer.css").toExternalForm());
+			MediaController.scene.getStylesheets().add(
+					MediaController.class.getResource(
+							"/com/kc/style/MediaPlayer.css").toExternalForm());
 			MediaController.primaryStage.setScene(MediaController.scene);
 			MediaController.primaryStage.show();
-			
+
 			executor = Executors.newCachedThreadPool();
-			
+
 			scene.widthProperty().addListener(new ChangeListener<Number>() {
 
 				@Override
 				public void changed(
 						ObservableValue<? extends Number> observable,
 						Number oldValue, Number newValue) {
-					if(null!=mediaView)
+					if (null != mediaView)
 						mediaView.setFitWidth(newValue.doubleValue());
 				}
 			});
@@ -116,12 +123,11 @@ public class MediaController extends Application implements Initializable {
 						ObservableValue<? extends Number> observable,
 						Number oldValue, Number newValue) {
 					// Subtracting height of MediaControl & Menu on top
-					if(null!=mediaView)
-					{
+					if (null != mediaView) {
 						if (!primaryStage.isFullScreen())
-								mediaView.setFitHeight(newValue.doubleValue() - 25 - 40);
+							mediaView.setFitHeight(newValue.doubleValue() - 25 - 45);
 						else
-								mediaView.setFitHeight(newValue.doubleValue());
+							mediaView.setFitHeight(newValue.doubleValue());
 					}
 				}
 			});
@@ -140,17 +146,25 @@ public class MediaController extends Application implements Initializable {
 										stackPane.getChildren().clear();
 										scene.setRoot(root);
 										primaryStage.setFullScreen(false);
-										//mediaControlStage = new Stage();
+
 									} else {
-										root.setTop(new VBox());
-										root.setBottom(new HBox());
-										stackPane = new StackPane();
-										stackPane.getChildren().addAll(root, mediaControl);
-										scene.setRoot(stackPane);
-										primaryStage.setFullScreen(true);
-										StackPane.setMargin(mediaControl, new Insets(scene.getHeight()- 35, 0, 10, 0));
-										MediaControlHide command = new MediaControlHide(primaryStage, mediaControl);
-										executor.execute(command);
+										if (!(null == mediaPlayer)) {
+											root.setTop(new VBox());
+											root.setBottom(new HBox());
+											stackPane = new StackPane();
+											stackPane.getChildren().addAll(
+													root, mediaControl);
+											scene.setRoot(stackPane);
+											primaryStage.setFullScreen(true);
+											StackPane.setMargin(
+													mediaControl,
+													new Insets(scene
+															.getHeight() - 35,
+															0, 10, 0));
+											MediaControlHide command = new MediaControlHide(
+													primaryStage, mediaControl);
+											executor.execute(command);
+										}
 									}
 								}
 							}
@@ -178,60 +192,67 @@ public class MediaController extends Application implements Initializable {
 						String filePath = null;
 						tempList.clear();
 						for (File file : db.getFiles()) {
-							tempList.add(file.getAbsolutePath());
-							filePath = file.getAbsolutePath();
+							try {
+								if(PropertiesUtils.readFormats().contains("*"+file.getAbsolutePath().substring(file.getAbsolutePath().length() - 4)))
+								{
+									tempList.add(file);
+									filePath = file.getAbsolutePath();
+									if (null != mediaPlayer)
+										mediaPlayer.stop();
+									mediaControl.resetPlayList(tempList);
+									playVideo(filePath);
+								}
+								else
+								{
+									WarningDialog.showWarning(primaryStage);
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
-						if(null!=mediaPlayer)
-							mediaPlayer.stop();
-						mediaControl.resetPlayList(tempList);
-						
-						playVideo("file:/"
-								+ (filePath).replace("\\", "/").replace(" ",
-										"%20"));
-						MediaControl.volButton.setSelected(false);
-						System.out.println(filePath);
 					}
 
 				}
 			});
-			
+
 			scene.addEventFilter(MouseEvent.ANY,
 					new EventHandler<MouseEvent>() {
 						@Override
 						public void handle(MouseEvent arg0) {
-							if(primaryStage.isFullScreen())
-							{
+							if (primaryStage.isFullScreen()) {
 								mediaControl.setOpacity(1.0);
 							}
 						}
-			});
-			
-			
-			scene.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-			        @Override
-			        public void handle(KeyEvent t) {
-			          if(t.getCode()==KeyCode.ESCAPE)
-			          {
-			        	  if (((HBox)root.getBottom()).getChildren().size()==0) {
-								root.setTop(menuBar);
-								root.setBottom(mediaControl);
-								stackPane.getChildren().clear();
-								scene.setRoot(root);
-								primaryStage.setFullScreen(false);
-								mediaView.setFitHeight(scene.getHeight() - 25 - 40);
+					});
+
+			scene.addEventFilter(KeyEvent.KEY_PRESSED,
+					new EventHandler<KeyEvent>() {
+						@Override
+						public void handle(KeyEvent t) {
+							if (t.getCode() == KeyCode.ESCAPE) {
+								if (((HBox) root.getBottom()).getChildren()
+										.size() == 0) {
+									root.setTop(menuBar);
+									root.setBottom(mediaControl);
+									stackPane.getChildren().clear();
+									scene.setRoot(root);
+									primaryStage.setFullScreen(false);
+									mediaView.setFitHeight(scene.getHeight() - 25 - 40);
+								}
 							}
-			          }
-			        }
-			    });
+						}
+					});
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void playVideo(String MEDIA_URL) {
 		try {
+			MEDIA_URL = URLEncoder.encode(MEDIA_URL, "UTF-8");
+			MEDIA_URL = "file:/"
+					+ (MEDIA_URL).replace("\\", "/").replace("+", "%20");
 			Media media = new Media(MEDIA_URL);
 			// create media player
 			mediaPlayer = new MediaPlayer(media);
@@ -247,71 +268,88 @@ public class MediaController extends Application implements Initializable {
 
 			mediaView.setFitHeight(scene.getHeight() - 25 - 40);
 			mediaView.setFitWidth(scene.getWidth());
-			
+			MediaControl.volButton.setSelected(false);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	@FXML
 	public void openFile() {
-		FileChooser chooser = new FileChooser();
-		chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("MP4 files", "*.mp4", "*.uvu", "*.m4v"));
-		
-		List<File> listOfFiles = new ArrayList<File>();
-		listOfFiles=chooser.showOpenMultipleDialog(MediaController.primaryStage);
-		if(listOfFiles!=null)
-		{
-			tempList.clear();
-            for (File file : listOfFiles) {
-                tempList.add(file.getAbsolutePath());
-            }
-            mediaControl.resetPlayList(tempList);
+		try {
+			FileChooser chooser = new FileChooser();
+			chooser.getExtensionFilters().addAll(
+					new FileChooser.ExtensionFilter("Files", PropertiesUtils
+							.readFormats()));
+
+			List<File> listOfFiles = new ArrayList<File>();
+			listOfFiles = chooser
+					.showOpenMultipleDialog(MediaController.primaryStage);
+			if (listOfFiles != null) {
+				tempList.clear();
+				for (File file : listOfFiles) {
+					tempList.add(file);
+				}
+				if (null != mediaPlayer)
+					mediaPlayer.stop();
+				mediaControl.resetPlayList(tempList);
+				playVideo(listOfFiles.get(0).getAbsolutePath());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	public void exitPlayer() {
 		primaryStage.close();
 	}
-	
-	public void about()
-	{
+
+	public void about() {
 		final Stage stage = new Stage();
 		stage.initStyle(StageStyle.TRANSPARENT);
 		stage.initModality(Modality.WINDOW_MODAL);
 		stage.initOwner(this.primaryStage);
 		VBox stageBox = new VBox(10);
+		stageBox.setId("about");
 		stageBox.setPadding(new Insets(0, 0, 0, 10));
 		HBox closeBox = new HBox();
 		Button closeButton = new Button("");
 		closeButton.setId("close");
 		closeBox.setAlignment(Pos.TOP_RIGHT);
 		closeBox.getChildren().add(closeButton);
-		Label label = new Label("Unknown Media player");
-		Hyperlink link = new Hyperlink("Google");
-		stageBox.getChildren().addAll(closeBox,label,link);
-		Scene scene = new Scene(stageBox,200,200);
-		scene.getStylesheets().add(MediaController.class.getResource("/com/kc/style/MediaPlayer.css").toExternalForm());
+		Label name = new Label(PropertiesUtils.readDetails().get("name"));
+		name.setId("header1");
+		Label version = new Label(PropertiesUtils.readDetails().get("version"));
+		version.setId("version");
+		Hyperlink link = new Hyperlink();
+		link.setText("Click here to visit us");
+		link.setId("link");
+		stageBox.getChildren().addAll(closeBox, name, version, link);
+		Scene scene = new Scene(stageBox, 400, 150);
+		scene.getStylesheets().add(
+				MediaController.class.getResource(
+						"/com/kc/style/MediaPlayer.css").toExternalForm());
 		stage.setScene(scene);
 		stage.show();
-		
+
 		closeButton.setOnAction(new EventHandler<ActionEvent>() {
-			
+
 			@Override
 			public void handle(ActionEvent event) {
-				
+
 				stage.close();
-				
+
 			}
 		});
 		link.setOnAction(new EventHandler<ActionEvent>() {
-			
+
 			@Override
 			public void handle(ActionEvent event) {
-				
-				getHostServices().showDocument("https://www.google.co.in/");
-				
+
+				getHostServices().showDocument(
+						PropertiesUtils.readDetails().get("link"));
+
 			}
 		});
 	}
@@ -319,5 +357,5 @@ public class MediaController extends Application implements Initializable {
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
+
 }
