@@ -92,6 +92,24 @@
 #close{
 	 -fx-background-color: transparent; 
 	 -fx-background-radius: 0,0,0;
-	 -fx-graphic: url("close.png");
+	 -fx-graphic: url("close-icon.png");
+	 
+	 }
+#add{
+	 -fx-background-color: transparent; 
+	 -fx-background-radius: 0,0,0;
+	 -fx-background-repeat: no-repeat;
+ 	 -fx-background-position: center;
+ 	 -fx-padding: 3px;
+	 -fx-graphic: url("add-icon.png");
+	 
+	 }
+#delete{
+	 -fx-background-color: transparent; 
+	 -fx-background-radius: 0,0,0;
+	 -fx-background-repeat: no-repeat;
+ 	 -fx-background-position: center;
+ 	 -fx-padding: 3px;
+	 -fx-graphic: url("delete-icon.png");
 	 
 	 }

@@ -288,7 +288,7 @@ public class MediaController extends Application implements Initializable {
 		closeButton.setId("close");
 		closeBox.setAlignment(Pos.TOP_RIGHT);
 		closeBox.getChildren().add(closeButton);
-		Label label = new Label("Media player");
+		Label label = new Label("Unknown Media player");
 		Hyperlink link = new Hyperlink("Google");
 		stageBox.getChildren().addAll(closeBox,label,link);
 		Scene scene = new Scene(stageBox,200,200);

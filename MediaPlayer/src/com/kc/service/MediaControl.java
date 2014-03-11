@@ -84,14 +84,17 @@ public class MediaControl extends HBox {
         playListButton.setId("playlist");
         listBox = new VBox(5);
 		playList = new ListView<String>();
-		add = new Button("Add");
-		remove = new Button("Remove");
-		HBox box = new HBox(5);
+		add = new Button("");
+		add.setId("add");
+		remove = new Button("");
+		remove.setId("delete");
+		HBox box = new HBox();
 		box.setPadding(new Insets(0, 5, 5, 5));
 		box.getChildren().addAll(add,remove);
 		box.setAlignment(Pos.CENTER);
 		listBox.getChildren().addAll(playList,box);
 		final Scene scene = new Scene(listBox);
+		scene.getStylesheets().add(MediaControl.class.getResource("/com/kc/style/MediaPlayer.css").toExternalForm());
         
         playListButton.setOnAction(new EventHandler<ActionEvent>() {
 			
