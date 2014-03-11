@@ -52,7 +52,7 @@ public class MediaControl extends HBox {
     private Button playButton;
     private Button stopButton;
     private Button playListButton;
-    private ToggleButton volButton;
+    public static ToggleButton volButton;
     private ToggleGroup group;
     private VBox listBox;
     private ListView<String> playList;
@@ -245,6 +245,14 @@ public class MediaControl extends HBox {
                 	if(null!=mediaPlayer)
                 	{
                 		// multiply duration by percentage calculated by slider position
+                		if(volumeSlider.getSlider().getValue()>0)
+                		{
+                			volButton.setSelected(false);
+                		}
+                		else if(volumeSlider.getSlider().getValue()==0)
+                		{
+                			volButton.setSelected(true);
+                		}
                 		mediaPlayer.setVolume(volumeSlider.getSlider().getValue() / 100.0);
                 		prevVolStatus=volumeSlider.getSlider().getValue() / 100.0;
                 	}
@@ -312,6 +320,7 @@ public class MediaControl extends HBox {
 					mediaController.playVideo("file:/"
 							+ (filePath).replace("\\", "/").replace(" ",
 									"%20"));
+					volButton.setSelected(false);
 					playButton.setDisable(false);
 					currentVedio=filePath;
 					System.out.println(filePath);

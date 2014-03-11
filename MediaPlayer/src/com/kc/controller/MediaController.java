@@ -75,7 +75,7 @@ public class MediaController extends Application implements Initializable {
 			menuBar = (MenuBar) root.getTop();
 			// creating Space for media
 			HBox rectangle = new HBox();
-			rectangle.setPrefSize(600, 300);
+			rectangle.setPrefSize(500, 300);
 			root.setCenter(rectangle);
 
 			// Controls at Bottom
@@ -177,9 +177,11 @@ public class MediaController extends Application implements Initializable {
 						if(null!=mediaPlayer)
 							mediaPlayer.stop();
 						mediaControl.resetPlayList(tempList);
+						
 						playVideo("file:/"
 								+ (filePath).replace("\\", "/").replace(" ",
 										"%20"));
+						MediaControl.volButton.setSelected(false);
 						System.out.println(filePath);
 					}
 
