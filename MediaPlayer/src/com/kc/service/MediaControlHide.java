@@ -1,6 +1,8 @@
 package com.kc.service;
 
 import javafx.animation.FadeTransition;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -21,7 +23,7 @@ public class MediaControlHide implements Runnable {
 	public void run() {
 
 		try {
-			FadeTransition ft = new FadeTransition(Duration.millis(1000),
+			final FadeTransition ft = new FadeTransition(Duration.millis(1000),
 					mediaControl);
 			while (primaryStage.isFullScreen()) {
 				if (mediaControl.getOpacity() == 1) {
@@ -31,6 +33,14 @@ public class MediaControlHide implements Runnable {
 					ft.setToValue(0.0);
 					ft.setCycleCount(1);
 					ft.play();
+					mediaControl.setOnMouseMoved(new  EventHandler<MouseEvent>() {
+
+						@Override
+						public void handle(MouseEvent event) {
+							ft.stop();
+							mediaControl.setOpacity(1.0);
+						}
+					});
 				}
 			}
 			System.out.println("Exit FullScreen !");
