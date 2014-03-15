@@ -1,5 +1,7 @@
 package com.kc.service;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javafx.animation.FadeTransition;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
@@ -25,25 +27,28 @@ public class MediaControlHide implements Runnable {
 		try {
 			final FadeTransition ft = new FadeTransition(Duration.millis(1000),
 					mediaControl);
+			final AtomicBoolean control = new AtomicBoolean(true);
 			while (primaryStage.isFullScreen()) {
-				if (mediaControl.getOpacity() == 1) {
-					System.out.println("This is it");
-					Thread.sleep(2000);
-					ft.setFromValue(1.0);
-					ft.setToValue(0.0);
-					ft.setCycleCount(1);
-					ft.play();
+				if(control.get())
+				{
+					if (mediaControl.getOpacity() == 1) {
+						Thread.sleep(4000);
+						ft.setFromValue(1.0);
+						ft.setToValue(0.0);
+						ft.setCycleCount(1);
+						ft.play();
+					}
 					mediaControl.setOnMouseMoved(new  EventHandler<MouseEvent>() {
-
+						
 						@Override
 						public void handle(MouseEvent event) {
 							ft.stop();
+							control.set(false);
 							mediaControl.setOpacity(1.0);
 						}
 					});
 				}
 			}
-			System.out.println("Exit FullScreen !");
 			ft.stop();
 			mediaControl.setOpacity(1.0);
 		} catch (Exception e) {
