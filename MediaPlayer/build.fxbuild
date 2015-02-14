@@ -1,2 +1,0 @@
-jfx.build.stagingdir = ${workspace}/Media/build
-jfx.build.apptitle = Media
