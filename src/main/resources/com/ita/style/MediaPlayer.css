@@ -1,3 +1,7 @@
+.root {
+	-fx-background-color: black;
+}
+
 .slider .thumb {
     -fx-background-color: transparent;
     -fx-background-image: url("slider.png");
@@ -10,8 +14,7 @@
 .button, .toggle-button{
 	 -fx-background-color: transparent; 
 	 -fx-background-radius: 0,0,0;
-	 
-	 }
+}
 	
 #timeLabel{
 	-fx-text-fill : white;

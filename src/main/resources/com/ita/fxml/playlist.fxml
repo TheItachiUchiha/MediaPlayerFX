@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="211.0" stylesheets="@../style/MediaPlayer.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ita.controller.PlaylistController">
+   <children>
+      <ListView fx:id="playList" prefHeight="233.0" prefWidth="211.0" VBox.vgrow="ALWAYS" />
+      <HBox alignment="CENTER" prefHeight="54.0" prefWidth="211.0">
+         <children>
+            <Button id="add" fx:id="add" mnemonicParsing="false" onAction="#add" />
+            <Button id="delete" fx:id="delete" mnemonicParsing="false" onAction="#delete" />
+         </children>
+      </HBox>
+   </children>
+</VBox>
