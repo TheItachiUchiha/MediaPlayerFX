@@ -8,6 +8,11 @@
     <artifactId>MediaPlayerFX</artifactId>
     <version>0.0.1</version>
 
+    <!-- Required by JavaFX maven plugin-->
+    <organization>
+        <name>MediaPlayerFX</name>
+    </organization>
+
     <build>
         <plugins>
             <!-- compiler plugin to use java version 1.8 -->
@@ -21,13 +26,29 @@
                 </configuration>
             </plugin>
 
-            <!--maven plugin to execute program using comamnd "mvn exec:java" -->
+            <!--maven plugin to execute program using command "mvn exec:java" -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.3.2</version>
                 <configuration>
                     <mainClass>com.ita.main.Main</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- plugin to create distributions -->
+            <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>8.1.2</version>
+                <configuration>
+                    <mainClass>com.ita.main.Main</mainClass>
+                    <jarFileName>MediaPlayerFX.jar</jarFileName>
+                    <signJar>
+                        <alias>MediaPlayerFX</alias>
+                        <storePassword>MediaPlayerFX</storePassword>
+                    </signJar>
+                    <nativeInstallers/>
                 </configuration>
             </plugin>
         </plugins>
