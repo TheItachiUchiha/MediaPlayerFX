@@ -43,12 +43,7 @@
                 <version>8.1.2</version>
                 <configuration>
                     <mainClass>com.ita.main.Main</mainClass>
-                    <jarFileName>MediaPlayerFX.jar</jarFileName>
-                    <signJar>
-                        <alias>MediaPlayerFX</alias>
-                        <storePassword>MediaPlayerFX</storePassword>
-                    </signJar>
-                    <nativeInstallers/>
+                    <jfxMainAppJarName>MediaPlayerFX.jar</jfxMainAppJarName>
                 </configuration>
             </plugin>
         </plugins>
