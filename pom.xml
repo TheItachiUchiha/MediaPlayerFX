@@ -6,7 +6,7 @@
 
     <groupId>com.ita</groupId>
     <artifactId>MediaPlayerFX</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <build>
         <plugins>
