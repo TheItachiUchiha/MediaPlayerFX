@@ -79,6 +79,7 @@ public class MediaPlayerController implements Initializable {
     private ObjectProperty<Path> selectedMedia = new SimpleObjectProperty<>();
     private ObjectProperty<Path> deletedMedia = new SimpleObjectProperty<>();
     private Stage stage;
+    private int previousValue;
     private boolean stopRequested = false;
     private boolean atEndOfMedia = false;
     private Duration duration;
@@ -136,7 +137,12 @@ public class MediaPlayerController implements Initializable {
 
     @FXML
     void muteUnmute(ActionEvent event) {
-
+        if(volumeSlider.sliderValueProperty().intValue() == 0){
+            volumeSlider.sliderValueProperty().setValue(previousValue);
+        } else {
+            previousValue = volumeSlider.sliderValueProperty().intValue();
+            volumeSlider.sliderValueProperty().setValue(0);
+        }
     }
 
     @FXML
@@ -255,20 +261,18 @@ public class MediaPlayerController implements Initializable {
         });
 
         volumeSlider.sliderValueProperty().addListener((ov) -> {
-            if (volumeSlider.isTheValueChanging()) {
-                if (null != mediaPlayer) {
-                    // multiply duration by percentage calculated by
-                    // slider position
-                    if (volumeSlider.sliderValueProperty().getValue() > 0) {
-                        volume.setSelected(false);
-                    } else if (volumeSlider.sliderValueProperty().getValue() == 0) {
-                        volume.setSelected(true);
-                    }
-                    mediaPlayer.setVolume(volumeSlider.sliderValueProperty()
-                            .getValue() / 100.0);
-                } else {
-                    volumeSlider.sliderValueProperty().setValue(0);
+            if (null != mediaPlayer) {
+                // multiply duration by percentage calculated by
+                // slider position
+                if (volumeSlider.sliderValueProperty().getValue() > 0) {
+                    volume.setSelected(false);
+                } else if (volumeSlider.sliderValueProperty().getValue() == 0) {
+                    volume.setSelected(true);
                 }
+                mediaPlayer.setVolume(volumeSlider.sliderValueProperty()
+                        .getValue() / 100.0);
+            } else {
+                volumeSlider.sliderValueProperty().setValue(0);
             }
         });
 
@@ -368,11 +372,10 @@ public class MediaPlayerController implements Initializable {
             scene.addEventFilter(KeyEvent.KEY_PRESSED, (keyEvent) -> {
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     ((Stage)scene.getWindow()).setFullScreen(false);
-                    mediaControl.setOpacity(1.0);
                 }
             });
 
-            scene.addEventFilter(MouseEvent.MOUSE_PRESSED, (mouseEvent) -> {
+            mediaView.addEventFilter(MouseEvent.MOUSE_PRESSED, (mouseEvent) -> {
                 if (mouseEvent.getButton().equals(
                         MouseButton.PRIMARY)) {
                     if (mouseEvent.getClickCount() == 2) {
@@ -387,11 +390,9 @@ public class MediaPlayerController implements Initializable {
 
             scene.addEventFilter(MouseEvent.MOUSE_MOVED, (mouseEvent) -> {
                 if(stage.isFullScreen()) {
-                    mediaControl.setOpacity(1.0);
-                    ft.play();
+                    showTempMediaControlBar();
                 } else {
-                    ft.stop();
-                    mediaControl.setOpacity(1.0);
+                    showConstantMediaControlBar();
                 }
             });
 
@@ -406,8 +407,7 @@ public class MediaPlayerController implements Initializable {
         }
         node.setOnMouseMoved(mouseEvent -> {
             if(mouseEvent.getX() > 0) {
-                ft.stop();
-                mediaControl.setOpacity(1.0);
+                showConstantMediaControlBar();
             }
         });
     }
@@ -416,18 +416,25 @@ public class MediaPlayerController implements Initializable {
         try {
             stage.fullScreenProperty().addListener((observable, oldValue, newValue) -> {
                 if(newValue) {
-                    System.out.println("Into full screen");
-                    ft.play();
+                    showTempMediaControlBar();
                 } else {
-                    System.out.println("Exit full screen");
-                    ft.stop();
-                    mediaControl.setOpacity(1.0);
+                    showConstantMediaControlBar();
                 }
             });
-
-
         } catch (Exception iep) {
             iep.printStackTrace();
         }
+    }
+
+    private void showTempMediaControlBar(){
+        menuBar.setOpacity(0);
+        mediaControl.setOpacity(1.0);
+        ft.play();
+    }
+
+    private void showConstantMediaControlBar(){
+        menuBar.setOpacity(1);
+        ft.stop();
+        mediaControl.setOpacity(1.0);
     }
 }

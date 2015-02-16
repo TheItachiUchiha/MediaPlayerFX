@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.media.*?>
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.BorderPane?>
+<?scenebuilder-classpath-element ../../../../../../../target/classes?>
 
 <?import com.ita.ui.SliderBar?>
-<?scenebuilder-classpath-element ../../../../../../../target/classes?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.media.MediaView?>
 
 <BorderPane fx:id="root" prefHeight="-1.0" prefWidth="-1.0" stylesheets="@../style/MediaPlayer.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ita.controller.MediaPlayerController">
   <top>
@@ -53,10 +50,11 @@
                </HBox.margin>
             </Label>
             <Button id="playlist" fx:id="playlist" mnemonicParsing="false" onAction="#openPlaylist" />
-            <ToggleButton id="volume" fx:id="volume" mnemonicParsing="false">
+            <ToggleButton id="volume" fx:id="volume" mnemonicParsing="false" onAction="#muteUnmute">
                <toggleGroup>
                   <ToggleGroup fx:id="group" />
-               </toggleGroup></ToggleButton>
+               </toggleGroup>
+            </ToggleButton>
             <SliderBar fx:id="volumeSlider" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="130.0">
             </SliderBar>
          </children>

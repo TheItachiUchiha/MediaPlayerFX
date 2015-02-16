@@ -2,9 +2,6 @@ package com.ita.util;
 
 import javafx.util.Duration;
 
-/**
- * Created by Abhi on 14-02-2015.
- */
 public final class DateTimeUtil {
 
     public static String formatTime(Duration elapsed, Duration duration) {

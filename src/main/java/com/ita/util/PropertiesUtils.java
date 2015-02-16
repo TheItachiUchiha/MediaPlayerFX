@@ -8,7 +8,6 @@ public class PropertiesUtils {
 	{
 		Map<String, String> map = new HashMap<String, String>();
 		try{
-			//File f = new File("details.properties");
 			InputStream in = PropertiesUtils.class.getClassLoader().getResourceAsStream("details.properties");
 			Properties p = new Properties();
 			p.load(in);
