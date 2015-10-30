@@ -14,5 +14,10 @@ How to use the Project
 
 You can just clone the repository and use the follwoing maven commands:
 
-To Run                    -> mvn jfx:run
-To Build a Native Package -> mvn jfx:native 
+To Run
+                    
+    $ mvn jfx:run
+
+To Build a Native Package 
+
+    $ mvn jfx:native 
