@@ -360,11 +360,11 @@ public class MediaPlayerController implements Initializable {
                                 playVideo(filePath.toAbsolutePath().toString());
                             }
                             else {
-                                WarningDialog warningDialog = new WarningDialog((Stage)scene.getWindow());
+                                WarningDialog warningDialog = new WarningDialog("Please use a supported type!");
                                 warningDialog.show();
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            new ErrorDialog(e).show();
                         }
                     }
                 }
