@@ -1,5 +1,7 @@
 package com.ita.util;
 
+import com.ita.ui.ErrorDialog;
+
 import java.io.InputStream;
 import java.util.*;
 
@@ -16,7 +18,7 @@ public class PropertiesUtils {
 			map.put("link", p.getProperty("link"));
 		}
 		catch (Exception e) {
-			 e.printStackTrace();
+			new ErrorDialog(e).show();
 		}
 		return map;
 	}
@@ -32,7 +34,7 @@ public class PropertiesUtils {
 			formats = Arrays.asList(p.getProperty("formats").split(","));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			new ErrorDialog(e).show();
 		}
 		return formats;
 	}
