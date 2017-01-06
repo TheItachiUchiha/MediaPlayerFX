@@ -1,4 +1,4 @@
-package com.ita.main;
+package com.ita;
 
 import com.ita.controller.MediaPlayerController;
 import com.ita.controller.PlaylistController;
