@@ -32,6 +32,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Path;
@@ -156,9 +157,10 @@ public class MediaPlayerController implements Initializable {
 					new FileChooser.ExtensionFilter("Files", PropertiesUtils
 							.readFormats()));
 
-			Path newFile;
-            newFile = chooser.showOpenDialog(((MenuItem) event.getSource()).getParentPopup().getScene().getWindow()).toPath();
-			if (newFile != null) {
+            File selected = chooser.showOpenDialog(((MenuItem) event.getSource()).getParentPopup().getScene().getWindow());
+
+			if (selected != null) {
+			    Path newFile = selected.toPath();
                 if(!playListFiles.contains(newFile)) {
                     playListFiles.add(newFile);
                     playVideo(newFile.toString());
