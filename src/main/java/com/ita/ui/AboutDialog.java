@@ -37,7 +37,7 @@ public class AboutDialog {
         try {
             Desktop.getDesktop().browse(new URI(PropertiesUtils.readDetails().get("link")));
         } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
+            new ErrorDialog(e).show();
         }
     }
 }

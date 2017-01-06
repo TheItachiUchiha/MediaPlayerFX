@@ -1,6 +1,7 @@
 package com.ita.controller;
 
 import com.ita.ui.AboutDialog;
+import com.ita.ui.ErrorDialog;
 import com.ita.ui.SliderBar;
 import com.ita.ui.WarningDialog;
 import com.ita.util.DateTimeUtil;
@@ -166,7 +167,7 @@ public class MediaPlayerController implements Initializable {
                 }
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+            new ErrorDialog(e).show();
 		}
     }
 
@@ -220,7 +221,7 @@ public class MediaPlayerController implements Initializable {
             mediaView.autosize();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            new ErrorDialog(e).show();
         }
     }
 
@@ -397,7 +398,7 @@ public class MediaPlayerController implements Initializable {
             });
 
         } catch (Exception e) {
-            e.printStackTrace();
+            new ErrorDialog(e).show();
         }
     }
 
@@ -421,8 +422,8 @@ public class MediaPlayerController implements Initializable {
                     showConstantMediaControlBar();
                 }
             });
-        } catch (Exception iep) {
-            iep.printStackTrace();
+        } catch (Exception e) {
+            new ErrorDialog(e).show();
         }
     }
 
