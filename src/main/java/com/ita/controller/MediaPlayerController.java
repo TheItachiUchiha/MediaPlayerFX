@@ -177,7 +177,7 @@ public class MediaPlayerController implements Initializable {
 
     @FXML
     void about(ActionEvent event) {
-        AboutDialog aboutDialog = new AboutDialog(stage);
+        AboutDialog aboutDialog = new AboutDialog();
         aboutDialog.showAbout();
     }
 
